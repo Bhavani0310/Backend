@@ -1,15 +1,27 @@
 const mongoose = require('mongoose');
 
-const seatSchema = new mongoose.Schema({
-  seat_number: Number,
-});
 const workshopSchema = new mongoose.Schema({
-  workshop_name: String,
-  seats: [seatSchema],
+  college: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ClgInfo', // Reference to the College (User)
+    required: true,
+  },
+  workshopTitle: {
+    type: String,
+    required: true,
+  },
+  workshopDescription: {
+    type: String,
+  },
+  workshopSeats: {
+    type:String,
+    required:true,
+  },
+  workshopTiming: {
+    type: String,
+  },
+  // Add other workshop-related fields
 });
-const collegeSchema = new mongoose.Schema({
-  college_name: String,
-  workshops: [workshopSchema], 
-});
-const College = mongoose.model('College', collegeSchema);
-module.exports = College;
+
+const workshop = mongoose.model('Workshop', workshopSchema);
+module.exports= workshop;

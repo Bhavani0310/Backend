@@ -70,7 +70,7 @@ router.post("/login", async (req, res) => {
       process.env.JWT_SECRET || "fallback-secret-key", // Use a secure secret key
       { expiresIn: "1m" } // Set the token expiration time
     );
-    console.log("JWT Token:", token);
+    // console.log("JWT Token:", token);
     const personalInfo = await PersonalInfo.findOne({ userId: user._id });
 
     res.status(200).json({
@@ -82,10 +82,11 @@ router.post("/login", async (req, res) => {
         collegeName: personalInfo.collegeName,
       },
       token,
+
     });
-    console.log("Email:", email);
-    console.log("User:", user);
-    console.log("isPasswordValid:", isPasswordValid);
+    // console.log("Email:", email);
+    // console.log("User:", user);
+    // console.log("isPasswordValid:", isPasswordValid);
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });

@@ -4,9 +4,11 @@ const bcrypt = require("bcrypt");
 const User = require("./models/ClgUser");
 const PersonalInfo = require("./models/ClgInfo");
 const jwt = require("jsonwebtoken"); // Import JWT library
-
+const Workshop = require("./models/workshop");
 //Registration routing
 
+
+// Registration routing
 router.post("/registerclg", async (req, res) => {
   try {
     const {
@@ -16,36 +18,50 @@ router.post("/registerclg", async (req, res) => {
       JntuCode,
       Address,
       website,
+      workshops,
     } = req.body;
-    // existing user
+
+    // Check if the email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         message: "Email already exists",
       });
     }
-    // hash the password
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    // create a new user
+
+    // Create a new user
     const user = new User({ email, password: hashedPassword });
-    await user.save();
-    console.log(user._id, collegeName);
+    
+
+    // Create Workshop documents for each workshop
+    const workshopData = workshops.map((workshop) => ({
+      college: user._id,
+      workshopTitle: workshop.workshopTitle,
+      workshopDescription: workshop.workshopDescription,
+      workshopSeats: workshop.workshopSeats,
+      workshopTiming: workshop.workshopTiming,
+    }));
+
+    // Save the Workshop documents
+    const savedWorkshops = await Workshop.insertMany(workshopData);
+
+    // Create PersonalInfo document
     const PersonalInfoData = new PersonalInfo({
       userId: user._id,
       collegeName,
       JntuCode,
       Address,
       website,
+      workshops: savedWorkshops.map((workshop) => workshop._id),
     });
-    try {
-      await PersonalInfoData.save();
-      // Document saved successfully
-    } catch (error) {
-      console.error("Error saving PersonalInfoData:", error);
-      // Handle the error appropriately
-    }
-    res.status(201).json({
-      message: "User registered Successfully",
+    await user.save()
+    await PersonalInfoData.save();
+    ;
+    res.status(200).json({
+      message: "User registered successfully",
     });
   } catch (error) {
     console.error(error);
@@ -75,7 +91,7 @@ router.post("/loginclg", async (req, res) => {
       process.env.JWT_SECRET || "fallback-secret-key", // Use a secure secret key
       { expiresIn: "10m" } // Set the token expiration time
     );
-    console.log("JWT Token:", token);
+    // console.log("JWT Token:", token);
     const personalInfo = await PersonalInfo.findOne({ userId: user._id });
 
     res.status(200).json({
@@ -87,9 +103,9 @@ router.post("/loginclg", async (req, res) => {
         collegeName: personalInfo.collegeName,
       },
     });
-    console.log("Email:", email);
-    console.log("User:", user);
-    console.log("isPasswordValid:", isPasswordValid);
+    // console.log("Email:", email);
+    // console.log("User:", user);
+    // console.log("isPasswordValid:", isPasswordValid);
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });

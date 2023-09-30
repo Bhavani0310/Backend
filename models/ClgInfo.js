@@ -23,7 +23,7 @@ const personalInfoSchema = new mongoose.Schema({
         type:String,
     },
 
-    workshop:[{ type: mongoose.Schema.Types.ObjectId, ref: 'workshop' }],
+    workshops:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Workshop' }],
   });
   
   const ClgInfo = mongoose.model('ClgInfo', personalInfoSchema);

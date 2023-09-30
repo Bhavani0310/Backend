@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const postsRouter = require("./Auth");
 const postsRouter1 = require("./ClgList");
 const postsRouter2 = require("./AuthClg");
+const postsRouter3 = require("./Bookingdata");
 require('dotenv').config();
 
 const port =process.env.PORT || 4000;
@@ -44,6 +45,8 @@ app.use(bodyParser.json());
 app.use("/Adan", postsRouter);
 app.use("/Adan", postsRouter1);
 app.use("/Adan", postsRouter2);
+app.use("/Adan", postsRouter3);
+
 
 
 app.listen(port, function () {
