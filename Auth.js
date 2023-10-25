@@ -14,7 +14,7 @@ router.post("/register", async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({
+      return  res.status(400).json({
         message: "Email already exists",
       });
     }
@@ -56,12 +56,12 @@ router.post("/login", async (req, res) => {
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid email" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid password" });
     }
 
     // Generate a JWT token with a 10-minute expiration time
@@ -76,7 +76,7 @@ router.post("/login", async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       user: {
-        _id: user._id,
+        _id: personalInfo._id,
         email: user.email,
         name: personalInfo.name,
         collegeName: personalInfo.collegeName,

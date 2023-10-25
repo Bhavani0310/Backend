@@ -1,31 +1,53 @@
 const express = require('express');
 const router = express.Router();
-const Booking = require('./models/Booking'); // Import your Mongoose model
+const Booking = require('./models/Booking'); 
+const Workshop = require('./models/workshop');
 
-// Define a route to handle form submissions
 router.post('/booking', async (req, res) => {
   try {
-    // Extract data from the request body
-    const { user,collegeName, workshopTitle, Date, slotTime } = req.body;
+    const { user, collegeName, workshopTitle, Date, slotTime } = req.body;
 
-    // Create a new instance of the Booking model
+    const existingBooking = await Booking.findOne({ user, workshopTitle, Date });
+    if (existingBooking) {
+      return res.status(400).json({ message: 'User already has a booking for this workshop on the same date' });
+    }
+    const workshop = await Workshop.findOne({ 
+      collegeName,
+      workshopTitle: workshopTitle 
+    });
+
+    if (!workshop) {
+      return res.status(400).json({message: 'Workshop not found'});
+    }
+  
+    if (workshop.bookingNumber >= workshop.workshopSeats) {
+      return res.status(400).json({message: 'No seats are available for this workshop'});
+    }
+
+    // Increment bookingNumber
+    workshop.bookingNumber += 1;
+    
+    // Save the updated workshop document
+    await workshop.save();
+    console.log(workshop);
     const newBooking = new Booking({
-      
-      user,
+      user, 
       collegeName,
       workshopTitle,
       Date,
       slotTime,
+      bookingNumber: workshop.bookingNumber // Assign the current booking number
     });
-
-    // Save the data to the database
+    
     await newBooking.save();
+    console.log(newBooking);
+    res.status(201).json({message: 'Booking successful'});
 
-    res.status(201).json({ message: 'Form data saved successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error saving form data' });
+    res.status(500).json({message: 'Error booking workshop'});
   }
 });
+
 
 module.exports = router;

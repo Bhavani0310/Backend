@@ -17,6 +17,10 @@ const bookingSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  bookingNumber: {
+    type: Number,
+    default: 0, // Set the default value to 0
+  },
   slotTime: {
     type: String,
     required: true,
