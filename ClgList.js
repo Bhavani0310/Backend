@@ -169,7 +169,7 @@ router.get('/workshopsdetails/:userid', async (req, res) => {
     ]);
     console.log(workshops);
     if (workshops.length === 0) {
-      return res.status(404).json({ message: 'No workshops found for the specified collegeName.' });
+      return res.status(404).json({ message: 'No bookings found for the specified collegeName.' });
     }
 
     res.status(200).json(workshops);
