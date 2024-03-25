@@ -33,7 +33,7 @@ router.post("/registerclg", async (req, res) => {
     // Create a new user
     const user = new User({ email, password: hash});
   
-
+      
     // Create PersonalInfo document
     const PersonalInfoData = new PersonalInfo({
       userId: user._id,

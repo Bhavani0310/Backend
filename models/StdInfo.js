@@ -14,6 +14,10 @@ const personInfoSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    imageName: {
+        type:String,
+    },
+  created: { type: Date, default: Date.now }
 });
 let StdInfo=mongoose.model('StdInfo',personInfoSchema);
 

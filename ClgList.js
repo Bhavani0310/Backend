@@ -4,9 +4,10 @@ const Clg = require('./models/College');
 const ClgInfo = require('./models/ClgInfo');
 const  Workshop  = require('./models/workshop');
 const Booking = require('./models/Booking');
-const StdUser = require('./models/StdUser');
-const workshop = require('./models/workshop');
-// const Workshops = require('./models/Workshops');
+const multer = require('multer');
+const sharp = require('sharp');
+
+const { uploadFile, getObjectSignedUrl } = require('./s3.js');
 router.get('/colleges', async(req,res)=>{
     try {
         let posts = await Clg.find();
@@ -36,10 +37,6 @@ router.get('/colleges/view',async(req,res)=>{
     })
   }
 })
-
-// Define a route to fetch college names and related workshop details
-
-
 // Define a route to fetch college names and related workshop details
 router.get('/workshops', async (req, res) => {
   const aggregatePipeline = [
@@ -126,17 +123,22 @@ console.log(savedWorkshops);
   }
 });
 
-// Delete a workshop by ID (DELETE request)
-router.delete('/removeworkshops/:id', async (req, res) => {
+router.delete('/workshops/:clgInfoId/:workshopTitle', async (req, res) => {
   try {
-    const deletedWorkshop = await Workshop.findByIdAndDelete(req.params.id);
-    if (deletedWorkshop) {
-      res.status(200).json(deletedWorkshop);
-    } else {
-      res.status(404).json({ error: 'Workshop not found' });
+    // Extract ClgInfo ID and workshopTitle from the request parameters
+    const { clgInfoId, workshopTitle } = req.params;
+
+    // Check if the workshop exists and is associated with the provided ClgInfo ID
+    const workshop = await Workshop.findOneAndDelete({ college: clgInfoId, workshopTitle });
+
+    if (!workshop) {
+      return res.status(404).json({ message: 'Workshop not found' });
     }
-  } catch (error) {
-    res.status(400).json({ error: 'Could not delete the workshop' });
+
+    res.json({ message: 'Workshop deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -225,6 +227,25 @@ router.get('/workshopsforclg/:userid', async (req, res) => {
 });
 
 
+router.patch('/:workshopTitle', async (req, res) => {
+  try {
+    const workshop = await Workshop.findOne({ workshopTitle: req.params.workshopTitle });
+    if (!workshop) {
+      return res.status(404).json({ message: 'Workshop not found' });
+    }
+
+    // Update workshop fields based on the request body
+    Object.assign(workshop, req.body);
+
+    // Save the updated workshop
+    await workshop.save();
+
+    res.json(workshop);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 

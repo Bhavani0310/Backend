@@ -8,6 +8,8 @@ const postsRouter = require("./Auth");
 const postsRouter1 = require("./ClgList");
 const postsRouter2 = require("./AuthClg");
 const postsRouter3 = require("./Bookingdata");
+const postsRouter4=require("./Update_profile");
+const postsRouter5=require("./CollegeData");
 require('dotenv').config();
 
 const port =process.env.PORT || 4000;
@@ -27,18 +29,13 @@ mongoose.connect(
     }
 );
 mongoose.set("strictQuery", true);
-
-
-
 app.use(logger("dev"));
-
 var options = {
     keepAlive: 1,
     connectTimeoutMS: 30000,
     useNewUrlParser: true,
     useUnifiedTopology: true,
 };
-
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -46,9 +43,8 @@ app.use("/Adan", postsRouter);
 app.use("/Adan", postsRouter1);
 app.use("/Adan", postsRouter2);
 app.use("/Adan", postsRouter3);
-
-
-
+app.use("/Adan", postsRouter4);
+app.use("/Adan", postsRouter5);
 app.listen(port, function () {
     console.log("Runnning on " + port);
 });
