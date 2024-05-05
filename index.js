@@ -14,6 +14,11 @@ require('dotenv').config();
 
 const port =process.env.PORT || 4000;
 const conn_str =process.env.DATABASE_URL;
+
+app.use(cors({
+    origin: ['https://adan-pradan.vercel.app'],
+    credentials: true,
+  }));
 mongoose.connect(
     conn_str,
     {
@@ -30,13 +35,7 @@ mongoose.connect(
 );
 mongoose.set("strictQuery", true);
 app.use(logger("dev"));
-var options = {
-    keepAlive: 1,
-    connectTimeoutMS: 30000,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-};
-app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/Adan", postsRouter);
